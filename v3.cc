@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
-#include <cstring>
+#include <algorithm>
 
 void Usage(std::string const &program) {
   std::cerr << "Usage: " << program << " [INPUT [OUTPUT]]\n";
@@ -16,7 +16,7 @@ std::vector<std::string> Split(std::string const &str, Pred pred) {
   auto last = str.end();
   while (first < last) {
     auto it = std::find_if(first, last, pred);
-    tokens.push_back(std::string{first, it});
+    tokens.push_back(std::string(first, it));
     first = it + 1;
   }
   return tokens;

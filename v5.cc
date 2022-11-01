@@ -3,6 +3,7 @@
 #include <fstream>
 #include <cstring>
 #include <charconv>
+#include <algorithm>
 
 void Usage(std::string const &program) {
   std::cerr << "Usage: " << program << " [INPUT [OUTPUT]]\n";
