@@ -10,9 +10,17 @@ void Usage(std::string const &program) {
                "OUTPUT: output file. Default: stdout\n";
 }
 
+struct Token {
+  char const *first;
+  char const *last;
+
+  explicit Token(const char *first, const char *last)
+      : first(first), last(last) {}
+};
+
 template<typename Pred>
 auto Split(std::string const &str, Pred pred) {
-  std::vector<std::pair<char const *, char const *>> tokens;
+  std::vector<Token> tokens;
   auto first = str.begin();
   auto last = str.end();
   while (first < last) {
@@ -60,11 +68,11 @@ int main(int argc, const char **argv) {
   std::vector<int64_t> xs;
   auto input = ReadAll(ifs);
   auto tokens = Split(input, [](auto c) { return std::isspace(c); });
-  for (auto &pair: tokens) {
-    if (pair.first == pair.second) continue;
+  for (auto &token: tokens) {
+    if (token.first == token.last) continue;
     int64_t val;
-    auto [ptr, ec] {std::from_chars(pair.first, pair.second, val)};
-    if (ptr == pair.second) break;
+    auto [ptr, ec] {std::from_chars(token.first, token.last, val)};
+    if (ptr == token.last) break;
     xs.push_back(val);
   }
 
