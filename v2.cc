@@ -3,14 +3,14 @@
 #include <fstream>
 
 
-void Usage(std::string const& program) {
+void Usage(std::string const &program) {
   std::cerr << "Usage: " << program << " [INPUT [OUTPUT]]\n";
   std::cerr << "INPUT: input file. Default: stdin\n"
                "OUTPUT: output file. Default: stdout\n";
 }
 
-int main(int argc, const char** argv) {
-  auto Error = [argv] (std::string const& msg){
+int main(int argc, const char **argv) {
+  auto Error = [argv](std::string const &msg) {
     std::cerr << msg << "\n";
     Usage(argv[0]);
     exit(EXIT_FAILURE);
@@ -23,7 +23,7 @@ int main(int argc, const char** argv) {
 
   std::ifstream ifs{input_file};
   if (!ifs) Error("Cannot open " + input_file);
-  std::ofstream  ofs{output_file};
+  std::ofstream ofs{output_file};
   if (!ofs) Error("Cannot open " + output_file);
 
   std::vector<int64_t> xs;
@@ -35,7 +35,7 @@ int main(int argc, const char** argv) {
   }
 
   std::sort(xs.begin(), xs.end());
-  for (auto x : xs) {
+  for (auto x: xs) {
     auto s = std::to_string(x) + "\n";
     ofs.write(s.c_str(), s.size());
   }

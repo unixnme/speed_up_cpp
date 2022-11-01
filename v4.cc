@@ -22,6 +22,23 @@ std::vector<std::string> Split(std::string const &str, Pred pred) {
   return tokens;
 }
 
+std::string ReadAll(std::istream &istream) {
+  constexpr long BUFFER_SIZE = 4096;
+  std::string result;
+  auto cur_size = result.size();
+  while (true) {
+    result.resize(cur_size + BUFFER_SIZE);
+    auto n = istream.read(&result[cur_size], BUFFER_SIZE).gcount();
+    if (n == BUFFER_SIZE)
+      cur_size = result.size();
+    else {
+      result.resize(cur_size + n);
+      break;
+    }
+  }
+  return result;
+}
+
 int main(int argc, const char **argv) {
   auto Error = [argv](std::string const &msg) {
     std::cerr << msg << "\n";
@@ -40,7 +57,7 @@ int main(int argc, const char **argv) {
   if (!ofs) Error("Cannot open " + output_file);
 
   std::vector<int64_t> xs;
-  std::string input(std::istreambuf_iterator<char>{ifs}, {});
+  auto input = ReadAll(ifs);
   auto tokens = Split(input, [](auto c) { return std::isspace(c); });
   for (auto &token: tokens) {
     if (token.empty()) continue;

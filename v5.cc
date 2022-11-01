@@ -2,6 +2,7 @@
 #include <vector>
 #include <fstream>
 #include <cstring>
+#include <charconv>
 
 void Usage(std::string const &program) {
   std::cerr << "Usage: " << program << " [INPUT [OUTPUT]]\n";
@@ -10,16 +11,33 @@ void Usage(std::string const &program) {
 }
 
 template<typename Pred>
-std::vector<std::string> Split(std::string const &str, Pred pred) {
-  std::vector<std::string> tokens;
+auto Split(std::string const &str, Pred pred) {
+  std::vector<std::pair<char const *, char const *>> tokens;
   auto first = str.begin();
   auto last = str.end();
   while (first < last) {
     auto it = std::find_if(first, last, pred);
-    tokens.push_back(std::string{first, it});
+    tokens.emplace_back(&*first, &*last);
     first = it + 1;
   }
   return tokens;
+}
+
+std::string ReadAll(std::istream &istream) {
+  constexpr long BUFFER_SIZE = 4096;
+  std::string result;
+  auto cur_size = result.size();
+  while (true) {
+    result.resize(cur_size + BUFFER_SIZE);
+    auto n = istream.read(&result[cur_size], BUFFER_SIZE).gcount();
+    if (n == BUFFER_SIZE)
+      cur_size = result.size();
+    else {
+      result.resize(cur_size + n);
+      break;
+    }
+  }
+  return result;
 }
 
 int main(int argc, const char **argv) {
@@ -40,16 +58,14 @@ int main(int argc, const char **argv) {
   if (!ofs) Error("Cannot open " + output_file);
 
   std::vector<int64_t> xs;
-  std::string input(std::istreambuf_iterator<char>{ifs}, {});
+  auto input = ReadAll(ifs);
   auto tokens = Split(input, [](auto c) { return std::isspace(c); });
-  for (auto &token: tokens) {
-    if (token.empty()) continue;
-    try {
-      auto val = std::stoll(token);
-      xs.push_back(val);
-    } catch (std::exception &) {
-      break;
-    }
+  for (auto &pair: tokens) {
+    if (pair.first == pair.second) continue;
+    int64_t val;
+    auto [ptr, ec] {std::from_chars(pair.first, pair.second, val)};
+    if (ptr == pair.second) break;
+    xs.push_back(val);
   }
 
   std::sort(xs.begin(), xs.end());
