@@ -5,6 +5,7 @@
 #include <algorithm>
 
 void Usage(std::string const &program) {
+  std::ios_base::sync_with_stdio(false);
   std::cerr << "Usage: " << program << " [INPUT [OUTPUT]]\n";
   std::cerr << "INPUT: input file. Default: stdin\n"
                "OUTPUT: output file. Default: stdout\n";

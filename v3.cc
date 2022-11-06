@@ -23,6 +23,7 @@ std::vector<std::string> Split(std::string const &str, Pred pred) {
 }
 
 int main(int argc, const char **argv) {
+  std::ios_base::sync_with_stdio(false);
   auto Error = [argv](std::string const &msg) {
     std::cerr << msg << "\n";
     Usage(argv[0]);
